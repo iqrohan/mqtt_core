@@ -43,6 +43,11 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "wolfssl/wolfcrypt/logging.h"
 #include "wolfssl/wolfcrypt/random.h"
 
+#include "certs.h"
+#include "app.h"
+
+extern APP_DATA appData;
+
 static uint8_t _net_pres_wolfsslUsers = 0;
 typedef struct 
 {
@@ -126,7 +131,46 @@ bool NET_PRES_EncProviderStreamClientInit0(NET_PRES_TransportObject * transObjec
         wolfSSL_CTX_free(net_pres_wolfSSLInfoStreamClient0.context);
         return false;
     }
-    // Turn off verification, because SNTP is usually blocked by a firewall
+     
+    // Loading the private key for client authentication use
+//    if(wolfSSL_CTX_use_PrivateKey_buffer(net_pres_wolfSSLInfoStreamClient0.context, clientKeyPtr, clientKeyLen, SSL_FILETYPE_ASN1) != SSL_SUCCESS)
+//    {
+//        // Couldn't load the private key
+//        //SYS_CONSOLE_MESSAGE("Something went wrong loading the private key\r\n");
+//        wolfSSL_CTX_free(net_pres_wolfSSLInfoStreamClient0.context);
+//        return false;
+//    }
+//    
+//    // Loading the client cert so that the server can authenticate us (client authentication))
+//    if(wolfSSL_CTX_use_certificate_buffer(net_pres_wolfSSLInfoStreamClient0.context, clientCertPtr, clientCertLen, SSL_FILETYPE_ASN1) != SSL_SUCCESS)
+//    {
+//        // Couldn't load the client certificate
+//        //SYS_CONSOLE_MESSAGE("Something went wrong loading the client certificate\r\n");
+//        wolfSSL_CTX_free(net_pres_wolfSSLInfoStreamClient0.context);
+//        return false;
+//    }
+    
+        // Loading the private key for client authentication use
+    if(wolfSSL_CTX_use_PrivateKey_buffer(net_pres_wolfSSLInfoStreamClient0.context, appData.clientKey, strlen((char *)appData.clientKey), SSL_FILETYPE_PEM) != SSL_SUCCESS)
+    {
+        // Couldn't load the private key
+        //SYS_CONSOLE_MESSAGE("Something went wrong loading the private key\r\n");
+        wolfSSL_CTX_free(net_pres_wolfSSLInfoStreamClient0.context);
+        return false;
+    }
+    
+    // Loading the client cert so that the server can authenticate us (client authentication))
+    if(wolfSSL_CTX_use_certificate_buffer(net_pres_wolfSSLInfoStreamClient0.context, appData.clientCert, strlen((char *)appData.clientCert), SSL_FILETYPE_PEM) != SSL_SUCCESS)
+    {
+        // Couldn't load the client certificate
+        //SYS_CONSOLE_MESSAGE("Something went wrong loading the client certificate\r\n");
+        wolfSSL_CTX_free(net_pres_wolfSSLInfoStreamClient0.context);
+        return false;
+    }
+    
+    // Turn on verification, ensure SNTP is not blocked by firewall
+    // SSL_VERIFY_PEER:  This option is turned on by default so technically this
+    // is not needed
     wolfSSL_CTX_set_verify(net_pres_wolfSSLInfoStreamClient0.context, SSL_VERIFY_NONE, 0);
     net_pres_wolfSSLInfoStreamClient0.isInited = true;
     return true;

@@ -27,6 +27,11 @@
           </logicalFolder>
         </logicalFolder>
         <itemPath>../src/app.h</itemPath>
+        <itemPath>../src/app_nvm_support.h</itemPath>
+        <itemPath>../src/app_wifi_helper.h</itemPath>
+        <itemPath>../src/bsp_config.h</itemPath>
+        <itemPath>../src/parson.h</itemPath>
+        <itemPath>../src/queue.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="framework" projectFiles="true">
         <logicalFolder name="f1" displayName="crypto" projectFiles="true">
@@ -679,6 +684,11 @@
         <itemPath>../src/http_print.c</itemPath>
         <itemPath>../src/custom_http_app.c</itemPath>
         <itemPath>../src/mpfs_img2.c</itemPath>
+        <itemPath>../src/app_nvm_support.c</itemPath>
+        <itemPath>../src/app_wifi_helper.c</itemPath>
+        <itemPath>../src/bsp_sys_init.c</itemPath>
+        <itemPath>../src/parson.c</itemPath>
+        <itemPath>../src/queue.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="framework" projectFiles="true">
         <logicalFolder name="f1" displayName="crypto" projectFiles="true">
