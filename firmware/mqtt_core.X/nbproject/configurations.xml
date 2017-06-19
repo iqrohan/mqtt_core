@@ -5,6 +5,20 @@
                    displayName="Header Files"
                    projectFiles="true">
       <logicalFolder name="f2" displayName="app" projectFiles="true">
+        <logicalFolder name="f3" displayName="certs" projectFiles="true">
+          <itemPath>../src/certs/certs.h</itemPath>
+        </logicalFolder>
+        <logicalFolder name="f2" displayName="MQTTPacket" projectFiles="true">
+          <logicalFolder name="f1" displayName="src" projectFiles="true">
+            <itemPath>../src/MQTTPacket/src/MQTTConnect.h</itemPath>
+            <itemPath>../src/MQTTPacket/src/MQTTFormat.h</itemPath>
+            <itemPath>../src/MQTTPacket/src/MQTTPacket.h</itemPath>
+            <itemPath>../src/MQTTPacket/src/MQTTPublish.h</itemPath>
+            <itemPath>../src/MQTTPacket/src/MQTTSubscribe.h</itemPath>
+            <itemPath>../src/MQTTPacket/src/MQTTUnsubscribe.h</itemPath>
+            <itemPath>../src/MQTTPacket/src/StackTrace.h</itemPath>
+          </logicalFolder>
+        </logicalFolder>
         <logicalFolder name="f1" displayName="system_config" projectFiles="true">
           <logicalFolder name="f1"
                          displayName="pic32mx695_iot_strtkit"
@@ -32,6 +46,7 @@
         <itemPath>../src/bsp_config.h</itemPath>
         <itemPath>../src/parson.h</itemPath>
         <itemPath>../src/queue.h</itemPath>
+        <itemPath>../src/mqtt_helper.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="framework" projectFiles="true">
         <logicalFolder name="f1" displayName="crypto" projectFiles="true">
@@ -640,6 +655,20 @@
                    displayName="Source Files"
                    projectFiles="true">
       <logicalFolder name="f2" displayName="app" projectFiles="true">
+        <logicalFolder name="f2" displayName="MQTTPacket" projectFiles="true">
+          <logicalFolder name="f1" displayName="src" projectFiles="true">
+            <itemPath>../src/MQTTPacket/src/MQTTConnectClient.c</itemPath>
+            <itemPath>../src/MQTTPacket/src/MQTTConnectServer.c</itemPath>
+            <itemPath>../src/MQTTPacket/src/MQTTDeserializePublish.c</itemPath>
+            <itemPath>../src/MQTTPacket/src/MQTTFormat.c</itemPath>
+            <itemPath>../src/MQTTPacket/src/MQTTPacket.c</itemPath>
+            <itemPath>../src/MQTTPacket/src/MQTTSerializePublish.c</itemPath>
+            <itemPath>../src/MQTTPacket/src/MQTTSubscribeClient.c</itemPath>
+            <itemPath>../src/MQTTPacket/src/MQTTSubscribeServer.c</itemPath>
+            <itemPath>../src/MQTTPacket/src/MQTTUnsubscribeClient.c</itemPath>
+            <itemPath>../src/MQTTPacket/src/MQTTUnsubscribeServer.c</itemPath>
+          </logicalFolder>
+        </logicalFolder>
         <logicalFolder name="f1" displayName="system_config" projectFiles="true">
           <logicalFolder name="f1"
                          displayName="pic32mx695_iot_strtkit"
@@ -689,6 +718,7 @@
         <itemPath>../src/bsp_sys_init.c</itemPath>
         <itemPath>../src/parson.c</itemPath>
         <itemPath>../src/queue.c</itemPath>
+        <itemPath>../src/mqtt_helper.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="framework" projectFiles="true">
         <logicalFolder name="f1" displayName="crypto" projectFiles="true">
@@ -922,7 +952,7 @@
         <targetDevice>PIC32MX695F512H</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
-        <platformTool>PICkit3PlatformTool</platformTool>
+        <platformTool>Simulator</platformTool>
         <languageToolchain>XC32</languageToolchain>
         <languageToolchainVersion>1.40</languageToolchainVersion>
         <platform>3</platform>
@@ -1075,84 +1105,6 @@
         <property key="save-temps" value="false"/>
         <property key="wpo-lto" value="false"/>
       </C32Global>
-      <PICkit3PlatformTool>
-        <property key="ADC 1" value="true"/>
-        <property key="AutoSelectMemRanges" value="auto"/>
-        <property key="CHANGE NOTICE" value="true"/>
-        <property key="COMPARATOR" value="true"/>
-        <property key="DMA" value="true"/>
-        <property key="ETHERNET CONTROLLER" value="true"/>
-        <property key="Freeze All Other Peripherals" value="true"/>
-        <property key="I2C1" value="true"/>
-        <property key="I2C3" value="true"/>
-        <property key="I2C4" value="true"/>
-        <property key="I2C5" value="true"/>
-        <property key="INPUT CAPTURE 1" value="true"/>
-        <property key="INPUT CAPTURE 2" value="true"/>
-        <property key="INPUT CAPTURE 3" value="true"/>
-        <property key="INPUT CAPTURE 4" value="true"/>
-        <property key="INPUT CAPTURE 5" value="true"/>
-        <property key="INTERRUPT CONTROL" value="true"/>
-        <property key="OUTPUT COMPARE 1" value="true"/>
-        <property key="OUTPUT COMPARE 2" value="true"/>
-        <property key="OUTPUT COMPARE 3" value="true"/>
-        <property key="OUTPUT COMPARE 4" value="true"/>
-        <property key="OUTPUT COMPARE 5" value="true"/>
-        <property key="PARALLEL MASTER/SLAVE PORT" value="true"/>
-        <property key="REAL TIME CLOCK" value="true"/>
-        <property key="SPI 2" value="true"/>
-        <property key="SPI 3" value="true"/>
-        <property key="SPI 4" value="true"/>
-        <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>
-        <property key="TIMER1" value="true"/>
-        <property key="TIMER2" value="true"/>
-        <property key="TIMER3" value="true"/>
-        <property key="TIMER4" value="true"/>
-        <property key="TIMER5" value="true"/>
-        <property key="ToolFirmwareFilePath"
-                  value="Press to browse for a specific firmware version"/>
-        <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
-        <property key="UART1" value="true"/>
-        <property key="UART2" value="true"/>
-        <property key="UART3" value="true"/>
-        <property key="UART4" value="true"/>
-        <property key="UART5" value="true"/>
-        <property key="UART6" value="true"/>
-        <property key="USB" value="true"/>
-        <property key="hwtoolclock.frcindebug" value="false"/>
-        <property key="memories.aux" value="false"/>
-        <property key="memories.bootflash" value="true"/>
-        <property key="memories.configurationmemory" value="true"/>
-        <property key="memories.configurationmemory2" value="true"/>
-        <property key="memories.dataflash" value="true"/>
-        <property key="memories.eeprom" value="true"/>
-        <property key="memories.flashdata" value="true"/>
-        <property key="memories.id" value="true"/>
-        <property key="memories.instruction.ram" value="true"/>
-        <property key="memories.instruction.ram.ranges"
-                  value="${memories.instruction.ram.ranges}"/>
-        <property key="memories.programmemory" value="true"/>
-        <property key="memories.programmemory.ranges" value="1d000000-1d003fff"/>
-        <property key="poweroptions.powerenable" value="false"/>
-        <property key="programmertogo.imagename" value=""/>
-        <property key="programoptions.donoteraseauxmem" value="false"/>
-        <property key="programoptions.eraseb4program" value="true"/>
-        <property key="programoptions.pgmspeed" value="2"/>
-        <property key="programoptions.preservedataflash" value="false"/>
-        <property key="programoptions.preservedataflash.ranges"
-                  value="${programoptions.preservedataflash.ranges}"/>
-        <property key="programoptions.preserveeeprom" value="false"/>
-        <property key="programoptions.preserveeeprom.ranges" value=""/>
-        <property key="programoptions.preserveprogram.ranges" value=""/>
-        <property key="programoptions.preserveprogramrange" value="false"/>
-        <property key="programoptions.preserveuserid" value="false"/>
-        <property key="programoptions.programcalmem" value="false"/>
-        <property key="programoptions.programuserotp" value="false"/>
-        <property key="programoptions.testmodeentrymethod" value="VPPFirst"/>
-        <property key="programoptions.usehighvoltageonmclr" value="false"/>
-        <property key="programoptions.uselvpprogramming" value="false"/>
-        <property key="voltagevalue" value="3.25"/>
-      </PICkit3PlatformTool>
     </conf>
   </confs>
 </configurationDescriptor>

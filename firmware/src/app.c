@@ -1,81 +1,13 @@
-/*******************************************************************************
-  MPLAB Harmony Application Source File
-  
-  Company:
-    Microchip Technology Inc.
-  
-  File Name:
-    app.c
-
-  Summary:
-    This file contains the source code for the MPLAB Harmony application.
-
-  Description:
-    This file contains the source code for the MPLAB Harmony application.  It 
-    implements the logic of the application's state machine and it may call 
-    API routines of other MPLAB Harmony modules in the system, such as drivers,
-    system services, and middleware.  However, it does not call any of the
-    system interfaces (such as the "Initialize" and "Tasks" functions) of any of
-    the modules in the system or make any assumptions about when those functions
-    are called.  That is the responsibility of the configuration-specific system
-    files.
- *******************************************************************************/
-
-// DOM-IGNORE-BEGIN
-/*******************************************************************************
-Copyright (c) 2013-2014 released Microchip Technology Inc.  All rights reserved.
-
-Microchip licenses to you the right to use, modify, copy and distribute
-Software only when embedded on a Microchip microcontroller or digital signal
-controller that is integrated into your product or third party product
-(pursuant to the sublicense terms in the accompanying license agreement).
-
-You should refer to the license agreement accompanying this Software for
-additional information regarding your rights and obligations.
-
-SOFTWARE AND DOCUMENTATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF
-MERCHANTABILITY, TITLE, NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE.
-IN NO EVENT SHALL MICROCHIP OR ITS LICENSORS BE LIABLE OR OBLIGATED UNDER
-CONTRACT, NEGLIGENCE, STRICT LIABILITY, CONTRIBUTION, BREACH OF WARRANTY, OR
-OTHER LEGAL EQUITABLE THEORY ANY DIRECT OR INDIRECT DAMAGES OR EXPENSES
-INCLUDING BUT NOT LIMITED TO ANY INCIDENTAL, SPECIAL, INDIRECT, PUNITIVE OR
-CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, COST OF PROCUREMENT OF
-SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
-(INCLUDING BUT NOT LIMITED TO ANY DEFENSE THEREOF), OR OTHER SIMILAR COSTS.
- *******************************************************************************/
-// DOM-IGNORE-END
-
-
-// *****************************************************************************
-// *****************************************************************************
-// Section: Included Files 
-// *****************************************************************************
-// *****************************************************************************
 
 #include "app.h"
+#include "mqtt_helper.h"
+#include "queue.h"
 
 // *****************************************************************************
 // *****************************************************************************
 // Section: Global Data Definitions
 // *****************************************************************************
 // *****************************************************************************
-
-// *****************************************************************************
-/* Application Data
-
-  Summary:
-    Holds application data
-
-  Description:
-    This structure holds the application's data.
-
-  Remarks:
-    This structure should be initialized by the APP_Initialize function.
-    
-    Application strings and buffers are be defined outside this structure.
-*/
-
 APP_DATA appData;
 
 // *****************************************************************************
@@ -84,71 +16,107 @@ APP_DATA appData;
 // *****************************************************************************
 // *****************************************************************************
 
-/* TODO:  Add any necessary callback functions.
-*/
 
 // *****************************************************************************
 // *****************************************************************************
 // Section: Application Local Functions
 // *****************************************************************************
 // *****************************************************************************
+void set_publish_flag(bool val)
+{
+    appData.pubFlag = val;
+}
+bool get_publish_flag()
+{
+    return appData.pubFlag;
+}
 
+void handler_topic_delta(unsigned char * payload)       // Callback from MQTT Helper
+{
+    JSON_Value *root_value = json_parse_string(payload);
+    if (json_value_get_type(root_value) != JSONObject)
+        return;
+    JSON_Object * tObject = json_value_get_object(root_value);
+    if (json_object_dotget_string(tObject, "state.led1") != NULL) {
+        if (strcmp(json_object_dotget_string(tObject, "state.led1"), "on") == 0) {
+            BSP_LEDOn(BSP_LED_1);
+            appData.led1 = true;
+            appData.publishObject.led1 = true;
+        } else if (strcmp(json_object_dotget_string(tObject, "state.led1"), "off") == 0) {
+            BSP_LEDOff(BSP_LED_1);
+            appData.led1 = false;
+            appData.publishObject.led1 = true;
+        }
+        set_publish_flag(true);
+    }
+    json_value_free(root_value);
+}
 
-/* TODO:  Add any necessary local functions.
-*/
+int create_publish_payload(MY_QUEUE *que, char *reportedPayload)
+{
+    // We build our PUBLISH payload
+    //char reportedPayload[200];
+    JSON_Value *root_value = json_value_init_object();
+    JSON_Object *root_object = json_value_get_object(root_value);
+    char *serialized_string = NULL;            
 
+    if(que->message_queue[que->front].s1)
+    {
+        json_object_dotset_string(root_object, "state.reported.button1", (bspData.previousStateS1 ? "up" : "down"));
+    }
+    if(que->message_queue[que->front].led1)
+    {
+        json_object_dotset_string(root_object, "state.reported.led1", (appData.led1 ? "on" : "off"));
+    }
 
+    // Serialize this JSON payload into a string
+    serialized_string = json_serialize_to_string(root_value);
+    sprintf(reportedPayload, serialized_string);
+    json_free_serialized_string(serialized_string);
+    json_value_free(root_value);
+
+    printf("Reported: %s\r\n", reportedPayload);
+
+    int  reportedPayload_len = strlen(reportedPayload);
+    return reportedPayload_len;
+}
 // *****************************************************************************
 // *****************************************************************************
 // Section: Application Initialization and State Machine Functions
 // *****************************************************************************
 // *****************************************************************************
 
-/*******************************************************************************
-  Function:
-    void APP_Initialize ( void )
-
-  Remarks:
-    See prototype in app.h.
- */
-
 void APP_Initialize ( void )
 {
     /* Place the App state machine in its initial state. */
     appData.state = APP_STATE_INIT;
 
-    
-    /* TODO: Initialize your application's state machine and other
-     * parameters.
-     */
 }
 
-
-/******************************************************************************
-  Function:
-    void APP_Tasks ( void )
-
-  Remarks:
-    See prototype in app.h.
- */
-
 void APP_Tasks ( void )
-{
-
-    /* Check the application's current state. */
+{ 
+    set_publish_flag(false);
+    
+    if (BSP_SWITCH_SwitchTest(BSP_SWITCH_1) != bspData.previousStateS1) {
+        set_publish_flag(true);
+        appData.publishObject.s1 = true;
+        bspData.previousStateS1 = BSP_SWITCH_SwitchTest(BSP_SWITCH_1);
+    }
+    
+    if (get_publish_flag() == true) {
+        // TODO: check which data should be published and then enqueue
+        enqueue((&appData.myQueue), appData.publishObject);
+        create_publish_payload(&appData.myQueue, appData.reported_payload);
+        set_publish_flag(false);
+    }
+    
     switch ( appData.state )
     {
-        /* Application's initial state. */
         case APP_STATE_INIT:
         {
-            bool appInitialized = true;
-       
-        
-            if (appInitialized)
-            {
-            
-                appData.state = APP_STATE_SERVICE_TASKS;
-            }
+            mqtt_helper_payload_info(&appData.myQueue, appData.reported_payload);
+            mqtt_helper_thing_info(appData.thing_name, appData.update_string, appData.delta_string);
+            mqtt_helper_init();
             break;
         }
 
@@ -158,10 +126,6 @@ void APP_Tasks ( void )
             break;
         }
 
-        /* TODO: implement your application state machine.*/
-        
-
-        /* The default state should never be executed. */
         default:
         {
             /* TODO: Handle error in application's state machine. */
